@@ -1,0 +1,43 @@
+## 十二、数据可视化
+# 1.基本参数
+先导入函数
+```
+import matplotlib.pyplot as plt
+```
+通用的参数为图标标题、坐标轴标签和刻度大小
+```
+plt.title("square Numbers", fontsize=24)
+plt.xlabel("Value",fontsize=14)
+plt.ylabel("Square of Valuee",fontsize=14)
+plt.tick_params(axis='both', which='major', labelsize=14)
+```
+亦可设置坐标轴的取值范围
+```
+plt.axis([x1, x2, y1, y2])
+```
+当作图完毕后，显示图形
+```
+plt.show()
+```
+如果要自动保存图标
+```
+plt.savefig('name.png', bbox_inches='tight')
+# bbox_inches='tight'为裁剪掉图多余的空白
+```
+# 2.作图函数
+## （1）plot
+如果直接使用.plot函数，它会自动拟合成曲线
+```
+plt.plot(x, y, linewidth=5)
+```
+如果不提供数据点，默认第一个数据点的x坐标为0
+## （2）散点图
+使用.scatter来绘制散点图
+```
+x_values = list(range(1,1001))
+y_values = [x**2 for x in x_values]
+plt.scatter(x_values, y_values, c=(0, 0, 0.8), edgecolor='none', s=40)
+#s为点的尺寸
+#2.0.0以后，默认edgecolor='none'，这一步是为了删除数据点的轮廓
+#c=(0, 0, 0.8)为RGB颜色，当然也可以使用c = 'red'，或者使用颜色映射：c=y_values, cmap=plt.cm.Blues
+
