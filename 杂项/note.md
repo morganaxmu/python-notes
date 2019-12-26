@@ -6,12 +6,13 @@
 ## 2.使用pip安装包
 一般python3默认带了pip3，就在python的scripts目录下。
 要使用pip，只需要在配置了环境变量之后，打开cmd，然后输入pip即可。
-python –m pip install –upgrade pip
+```
 python –m pip install request
+```
 ## 3.杂项的数据清洗
 比如爬虫获取到的是字典，但是里面镶嵌的是列表
 输出成txt，单独复制出来列表，用word打开，把“[”换成空格，“],”换成换行符（WORD的替换才能做到，txt的文本编辑器不行）然后再变成CSV文件
-<br>
+
 #一、字符串和数字
 Python中，””，’’括起来的就是字符串，如果字符串中包含’，应当使用””作为括号。字符串区分大小写，转换大写：用X.upper()，转换小写用X.lower()，只要首字母大写用X.title()
 Python使用+来合并字符串。例如：message=”Hello”+” ”+”world”，\n换行\t制表符也就是首行缩进。Python对空白敏感，去除不必要空白的方法是.rstrip()，但该方法不改变原定义，要去除原定义中的空白，使用A=A.rstrip()
