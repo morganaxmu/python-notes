@@ -2,7 +2,7 @@
 ## 1.从文件中读取数据
 读取语法：
  ```
-with open(‘相对路径名’) as name:
+with open('相对路径名') as name:
  ```
  e.g.
  ```
@@ -25,10 +25,10 @@ for line in name ():  #或者先创建一个变量，将name.readlines()赋值�
 ## 2.写入文件
 语句：
  ```
-filename = ‘文件名称.后缀’
+filename = '文件名称.后缀'
 
-with open(filename,’w’) as name:
-	name.write(‘XXX’)
+with open(filename,'w') as name:
+	name.write('XXX')
  ```
 open函数中第二个实参w表示写入模式，r为读取模式，a为附加模式，r+为读取和写入模式。如果缺省，默认用只读打开；如果写入的文件不存在，函数open()会自动创建它。
 使用w模式打开文件时，如果源文件存在，会清空该文件。
