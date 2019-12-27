@@ -40,4 +40,20 @@ plt.scatter(x_values, y_values, c=(0, 0, 0.8), edgecolor='none', s=40)
 #s为点的尺寸
 #2.0.0以后，默认edgecolor='none'，这一步是为了删除数据点的轮廓
 #c=(0, 0, 0.8)为RGB颜色，当然也可以使用c = 'red'，或者使用颜色映射：c=y_values, cmap=plt.cm.Blues
-
+```
+## （3）直方图
+```
+hist = pygal.Bar()
+```
+相关的设置也与plot类似
+```
+hist.title = "Results of rolling two D6 1000 times."
+hist.x_labels = ['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+hist.x_title = "Result"
+hist.y_title = "Frequency of Result"
+hist.add('D6+D6', frequencies)
+```
+保存成文件
+```
+hist.render_to_file('die_visual.svg')
+```
