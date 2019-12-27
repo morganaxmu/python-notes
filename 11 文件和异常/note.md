@@ -44,6 +44,12 @@ open函数中第二个实参w表示写入模式，r为读取模式，a为附加�
 with open(filename,'w', encoding='utf-8') as name:
    name.write(str(content))
 ```
+有的时候，会出现Python爬虫解析json遇到一类JSONDecodeError
+此时，直接使用read()即可
+```
+with open(filename) as f:
+   data = f.read()
+```
 ## 3.异常
 异常使用try-except代码块，其语句结构为：
  ```
