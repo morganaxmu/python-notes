@@ -32,8 +32,18 @@ with open(filename,'w') as name:
  ```
 open函数中第二个实参w表示写入模式，r为读取模式，a为附加模式，r+为读取和写入模式。如果缺省，默认用只读打开；如果写入的文件不存在，函数open()会自动创建它。
 使用w模式打开文件时，如果源文件存在，会清空该文件。
-.write方法不会自动换行，要自己输入换行符、空格、制表符
+.write方法不会自动换行，要自己输入换行符、空格、制表符。
 如果要添加内容而不是覆盖原有内容，应当使用a模式。
+此外，因为write只能保存string，所以一般要用str()把数据转换成string形式。
+有的时候会出现如下错误：
+```
+'gbk' codec can't encode character
+```
+此时只需要在open后面加一个编码就行，如：
+```
+with open(filename,'w', encoding='utf-8') as name:
+   name.write(str(content))
+```
 ## 3.异常
 异常使用try-except代码块，其语句结构为：
  ```
