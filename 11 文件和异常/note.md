@@ -4,6 +4,15 @@
  ```
 with open(‘相对路径名’) as name:
  ```
+ e.g.
+ ```
+ filename = 'xxx.csv'
+ with open(filename) as f:
+ 	reader = csv.reader(f)
+	header_row = next(reader)
+	print(header_row)
+```
+上面例子中的代码，读取了文件的第一行并储存在header_row中。
 相对路径名，为在当前执行文件的目录下该文件的名字，如test.txt
 如果要读取文件的内容，用 name.read()方法加载，最好将之赋值给一个变量。但read()方法读取到末尾会出现一个空行，如果不需要可以使用.rstrip()方法
 使用绝对路径名时，最好先用变量（比如path）储存该绝对路径，如E:\My Documents\R
