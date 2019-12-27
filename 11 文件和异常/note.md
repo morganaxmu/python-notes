@@ -55,10 +55,10 @@ else:
  ```
 Import json
 
-username=input(“what is your name?”)
+username=input("what is your name?")
 
-filename=’username.json’
-with open(filename,’w’) as f_obj:
+filename='username.json'
+with open(filename,'w') as f_obj:
 	json.dump(username,f_obj)
  ```
 要从json中加载，使用json.load(文件名)即可。
