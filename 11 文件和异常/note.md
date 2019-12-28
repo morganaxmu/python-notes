@@ -78,6 +78,21 @@ with open(filename,'w') as f_obj:
 	json.dump(username,f_obj)
  ```
 要从json中加载，使用json.load(文件名)即可。
+保存json文件的时候，其无法直接保存爬虫抓下来的字典，需要先转换成string
+```
+strhtml=requests.get(url,headers=headers,verify=False) 
+content = json.loads(strhtml.text)
+filename = 'Gems.json'
+with open(filename,'w',encoding='utf-8') as name:
+   name.write(str(content))
+```
+这导致在读取其的时候，要转换回字典。否则python会继续认为json中的元素为string
+```
+filename = 'Gems.json'
+with open(filename) as f:
+   data = f.read()
+   data = eval(data)
+```
 ## 5.重构代码
 重构代码，是将代码划分为一系列完成具体工作的函数。
 比如，要实现功能：“如果之前储存了该用户名，则向该用户发送问候消息；如果没有则提示用户创建一个新的”可以分为三块：
