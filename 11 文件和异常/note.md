@@ -50,6 +50,13 @@ with open(filename,'w', encoding='utf-8') as name:
 with open(filename) as f:
    data = f.read()
 ```
+当然，如果要把list或者dict写入CSV，最简单是调用csv库，这样就可以规避write所需要的string限制
+```
+import csv
+with open(filename1, 'w', newline='') as cf1:
+	csv1 = csv.writer(cf1)
+	csv1.writerow(times)
+```
 ## 3.异常
 异常使用try-except代码块，其语句结构为：
  ```
