@@ -64,3 +64,15 @@ hist.add('D6+D6', frequencies)
 ```
 hist.render_to_file('die_visual.svg')
 ```
+## （4）折线图
+```
+import pygal
+line_chart = pygal.Line(x_label_rotation=20, show_minor_x_labels=False)
+#第一个参数让标签顺时针旋转20°，第二个则是不需要显示所有标签
+line_chart.title = '任意标题'
+line_chat.x_labels = 时间的列表
+N = x坐标间隔
+line_chart.x_labels_major = 时间的列表[::N]
+line_chart.add('图例的名字',X的列表)
+line_chart.render_to_file('文件名.svg')
+```
