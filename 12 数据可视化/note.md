@@ -31,6 +31,13 @@ plt.savefig('name.png', bbox_inches='tight')
 plt.plot(x, y, linewidth=5)
 ```
 如果不提供数据点，默认第一个数据点的x坐标为0
+如果需要着色，需要提供一个x和对应的y1\y2，函数会在其区间内着色
+```
+plt.plot(x,y1,c='red',alpha=0.5)
+plt.plot(x,y2,c='blue',alpha=0.5)
+plt.fill_between(x,y1,y2,facecolor='blue',alpha=0.1)
+```
+alpha是透明度，0完全透明，1完全不透明。plot和R的不同，python的plot是直接加线而不是新的一张图。
 ## （2）散点图
 使用.scatter来绘制散点图
 ```
