@@ -1,9 +1,9 @@
 # 五、If语句
-Python中也有if语句。用==来检查条件相等，即条件测试：A==B 如果相等返回True，反之返回False，检查时区分大小写。用!=检查条件不相等，!表示不。合并测试条件用and，如age >= 21 and life >=22
-检查是否在列表中，只需要输入 not in 
-e.g.: if A not in As:
-布尔值即为True和False，可用于记录条件。
-If语句由条件测试和执行语句构成：
+Python中也有if语句。用==来检查条件相等，即条件测试：A==B 如果相等返回True，反之返回False，检查时区分大小写。用!=检查条件不相等，!表示不。合并测试条件用and，如age >= 21 and life >=22<br>
+检查是否在列表中，只需要输入 not in <br>
+e.g.: if A not in As:<br>
+布尔值即为True和False，可用于记录条件。<br>
+If语句由条件测试和执行语句构成：<br>
 ```
 if 条件测试：
   执行语句
