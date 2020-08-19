@@ -341,3 +341,116 @@ scores = [[0] * 3 for _ in range(5)]
 scores[0][0] = 95
 print(scores)    # [[95, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]
 ```
+### 元组
+元组的要点是函数返回多个值的时候的拆分，先从原理讲起。
+
+定义元组通常使用`()`字面量语法，如：
+```Python
+# 定义一个三元组
+t1 = (30, 10, 55)
+```
+`()`表示空元组，但是如果元组中只有一个元素，需要加上一个逗号，否则`()`就不是代表元组的字面量语法，而是改变运算优先级的圆括号，所以`('hello', )`和`(100, )`才是一元组，而`('hello')`和`(100)`只是字符串和整数。
+
+#### 打包和解包操作。
+
+当我们把多个用逗号分隔的值赋给一个变量时，多个值会打包成一个元组类型；当我们把一个元组赋值给多个变量时，元组会解包成多个值然后分别赋给对应的变量，如下面的代码所示。
+
+```Python
+# 打包
+a = 1, 10, 100
+print(type(a), a)    # <class 'tuple'> (1, 10, 100)
+# 解包
+i, j, k = a
+print(i, j, k)       # 1 10 100
+```
+如果变量数量对不上，就会报错。有一种解决变量个数少于元素的个数方法，就是使用星号表达式（但只能出现一次），用星号表达式修饰的变量会变成一个列表，列表中有0个或多个元素
+```Python
+a = 1, 10, 100, 1000
+i, j, *k = a
+print(i, j, k)          # 1 10 [100, 1000]
+i, *j, k = a
+print(i, j, k)          # 1 [10, 100] 1000
+*i, j, k = a
+print(i, j, k)          # [1, 10] 100 1000
+*i, j = a
+print(i, j)             # [1, 10, 100] 1000
+i, *j = a
+print(i, j)             # 1 [10, 100, 1000]
+i, j, k, *l = a
+print(i, j, k, l)       # 1 10 100 [1000]
+i, j, k, l, *m = a
+print(i, j, k, l, m)    # 1 10 100 1000 []
+```
+**解包语法对字符串、列表等一样成立**
+
+#### 函数返回值的解包
+```Python
+def comp(items):
+    max_one, min_one = items[0], items[0]
+    for item in items:
+        if item > max_one:
+            max_one = item
+        elif item < min_one:
+            min_one = item
+    return max_one, min_one
+```
+之后，可以把两个返回值分别解包
+```Python
+numbers = [1,2,3,4,5,6]
+a, b = comp(numbers)
+```
+### 字典
+因为集合有去重特性，所以大多数时候要用到字典
+
+在Python中创建字典可以使用`{}`字面量语法，`{}`中的元素是以键值对的形式存在的，每个元素由`:`分隔的两个值构成，`:`前面是键，`:`后面是值，和JSON类似
+
+想知道字典中一共有多少组键值对，仍然是使用`len`函数；如果想对字典进行遍历，可以用`for`循环，但是需要注意，`for`循环只是对字典的键进行了遍历
+
+**字典中的键必须是不可变类型**，例如整数（`int`）、浮点数（`float`）、字符串（`str`）、元组（`tuple`）等类型的值
+
+#### 字典的运算
+```Python
+person = {'name': 'bill', 'age': 55, 'weight': 60, 'office': 'No.10'}
+# 检查键在字典中
+print('name' in person, 'tel' in person)    # True False
+# 通过修改值
+if 'age' in person:
+    person['age'] = 20
+# 通过索引操作存入新的键值对
+person['tel'] = '1314'
+person['signature'] = '喵喵喵'
+print('name' in person, 'tel' in person)    # True True
+# 检查person字典中键值对的数量
+print(len(person))    # 6
+# 对字典的键进行循环并通索引运算获取键对应的值
+for key in person:
+    print(f'{key}: {person[key]}')
+# 对字典中所有的键值对进行循环遍历
+for key, value in person.items():
+    print(key, '--->', value)
+# 使用pop方法通过键删除对应的键值对并返回该值
+person1 = person.pop(name)
+# 使用update更新字典元素，相同的键会用新值覆盖掉旧值，不同的键会添加到字典中
+persons = {
+  1001{'name': 'bill', 'age': 55, 'weight': 60, 'office': 'No.10'}
+}
+person2 = {
+  1002{'name': 'billy', 'age': 25, 'weight': 70, 'office': 'No.30'}
+}
+persons.update(person2)
+```
+> **字典的生成式**：可以用字典的生成式语法来创建新字典。
+
+```Python
+stocks = {
+    'AAPL': 191.88,
+    'GOOG': 1186.96,
+    'IBM': 149.24,
+    'ORCL': 48.44,
+    'ACN': 166.89,
+    'FB': 208.09,
+    'SYMC': 21.29
+}
+stocks2 = {key: value for key, value in stocks.items() if value > 100}
+print(stocks2)
+```
