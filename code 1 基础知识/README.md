@@ -106,7 +106,7 @@ range是一个比较常用的函数，应用举例如下：
 - `range(100, 0, -2)`：可以用来产生100到1的偶数，其中-2是步长，即每次数字递减的值。
 ### while循环
 `while`循环通过一个能够产生或转换出`bool`值的表达式来控制循环，表达式的值为`True`则继续循环；表达式的值为`False`则结束循环。故while循环特别适合构造不知道具体循环次数的循环结构。
-"""
+```
 while True:
     counter += 1
     number = int(input('type any number'))
@@ -250,3 +250,94 @@ print(s.ljust(20, '~'))   # hello, world~~~~~~~~
 
 
 ## 5.元组、列表和字典
+### 列表
+在Python中，可以使用`[]`字面量语法来定义列表，列表中的多个元素用逗号进行分隔；还可以通过Python内置的`list`函数将其他序列变成列表
+
+列表的运算和字符串类似
+```Python
+items1 = [35, 12, 99, 68, 55, 87]
+items2 = [45, 8, 29]
+
+# 列表的拼接
+items3 = items1 + items2
+print(items3)    # [35, 12, 99, 68, 55, 87, 45, 8, 29]
+
+# 列表的重复
+items4 = ['hello'] * 3
+print(items4)    # ['hello', 'hello', 'hello']
+
+# 列表的成员运算
+print(100 in items3)        # False
+print('hello' in items4)    # True
+
+# 获取列表的长度(元素个数)
+size = len(items3)
+print(size)                 # 9
+
+# 列表的索引
+print(items3[0], items3[-size])        # 35 35
+items3[-1] = 100
+print(items3[size - 1], items3[-1])    # 100 100
+
+# 列表的切片
+print(items3[:5])          # [35, 12, 99, 68, 55]
+print(items3[4:])          # [55, 87, 45, 8, 100]
+print(items3[-5:-7:-1])    # [55, 68]
+print(items3[::-2])        # [100, 45, 55, 99, 35]
+```
+#### 列表元素的遍历
+
+```Python
+items = ['a', 'b', 'c', 'd']
+
+for index in range(len(items)):
+    print(items[index])
+```
+#### 添加和删除元素
+添加元素
+```Python
+items = ['a', 'b', 'c', 'd']
+# 使用append方法在列表尾部添加
+items.append('a')
+# 使用insert方法在列表指定索引位置插入元素
+items.insert(2, 'c')
+```
+删除元素
+```Python
+items = ['a', 'b', 'c', 'd']
+# 删除指定的元素
+items.remove('a')
+# 删除指定索引位置的元素,pop会返回删除的元素
+items.pop(len(items) - 1)
+# 清空列表中的元素
+items.clear()
+```
+#### 元素排序和反转
+
+列表的`sort`操作可以实现列表元素的排序，而`reverse`操作可以实现元素顺序的反转
+
+
+#### 创建列表
+
+推荐使用通过生成式创建列表
+
+```Python
+# 创建一个由1到9的数字构成的列表
+items1 = [x for x in range(1, 10)]
+print(items1)    # [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+# 创建一个由'hello world'中除空格和元音字母外的字符构成的列表
+items2 = [x for x in 'hello world' if x not in ' aeiou']
+print(items2)    # ['h', 'l', 'l', 'w', 'r', 'l', 'd']
+
+# 创建一个由个两个字符串中字符的笛卡尔积构成的列表
+items3 = [x + y for x in 'ABC' for y in '12']
+print(items3)    # ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
+```
+
+不能用`[[0] * 3] * 5]`这种方式来创建嵌套列表，应当用生成式来，如：
+```Python
+scores = [[0] * 3 for _ in range(5)]
+scores[0][0] = 95
+print(scores)    # [[95, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]
+```
