@@ -96,3 +96,57 @@ class Triangle(object):
 ## 继承和多态
 
 面向对象的编程语言支持在已有类的基础上创建新类，从而减少重复代码的编写。提供继承信息的类叫做父类（超类、基类），得到继承信息的类叫做子类（派生类、衍生类）。
+```Python
+class Person:
+    """人类"""
+
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+    
+    def eat(self):
+        print(f'{self.name}正在吃饭.')
+    
+    def sleep(self):
+        print(f'{self.name}正在睡觉.')
+
+
+class Student(Person):
+    """学生类"""
+    
+    def __init__(self, name, age):
+        # super(Student, self).__init__(name, age)
+        super().__init__(name, age)
+    
+    def study(self, course_name):
+        print(f'{self.name}正在学习{course_name}.')
+
+
+class Teacher(Person):
+    """老师类"""
+
+    def __init__(self, name, age, title):
+        # super(Teacher, self).__init__(name, age)
+        super().__init__(name, age)
+        self.title = title
+    
+    def teach(self, course_name):
+        print(f'{self.name}{self.title}正在讲授{course_name}.')
+
+
+
+stu1 = Student('白元芳', 21)
+stu2 = Student('狄仁杰', 22)
+teacher = Teacher('武则天', 35, '副教授')
+stu1.eat()
+stu2.sleep()
+teacher.teach('Python程序设计')
+stu1.study('Python程序设计')
+```
+继承的语法是在定义类的时候，在类名后的圆括号中指定当前类的父类。如果定义一个类的时候没有指定它的父类是谁，那么默认的父类是`object`类。`object`类是Python中的顶级类。
+
+在子类的初始化方法中，我们可以通过`super().__init__()`来调用父类初始化方法，`super`函数是Python内置函数中专门为获取当前对象的父类对象而设计的。从上面的代码可以看出，子类除了可以通过继承得到父类提供的属性和方法外，还可以定义自己特有的属性和方法，所以子类比父类拥有的更多的能力。在实际开发中，我们经常会用子类对象去替换掉一个父类对象，这是面向对象编程中一个常见的行为，也叫做“里氏替换原则”（Liskov Substitution Principle）。
+
+子类继承父类的方法后，还可以对方法进行重写（重新实现该方法），不同的子类可以对父类的同一个方法给出不同的实现版本，这样的方法在程序运行时就会表现出多态行为（调用相同的方法，做了不同的事情）。多态是面向对象编程中最精髓的部分，当然也是对初学者来说最难以理解和灵活运用的部分。
+
+多态部分的内容可以参见example 3
