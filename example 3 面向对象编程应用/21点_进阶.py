@@ -83,9 +83,11 @@ class Player:
     
     def judge(self):
         if self.value > 21:
-            return False
+            return 'you got 'f'{self.value}'' points! you lose!'
         else:
-            return self.value
+            return 'you got 'f'{self.value}'' points in total!'
+    def score(self):
+        return self.value
         
 class Bot(Player):
     def __init__(self, name):
@@ -93,23 +95,73 @@ class Bot(Player):
         self.cards = []
         self.value = 0
         
+    def output(self):
+        return 'bot got 'f'{self.value}'' points in total!'
+   
+        
+"""初始化"""
 deck = Deck()
 deck.shuffle()
-"""
-a= Player('a')
-for i in range(3):
-    a.get_one(deck.deal())
-print(a.cards)
-print(int(a.judge()))
-"""
-you = Player('a')
-a = int(input("初始抽几张牌？"))
-for i in range(a):
-    you.get_one(deck.deal())
+print("welcome to 21 points game，draw cards from the deck and get as many ponts as you can\n")
+print("But if you get over 21 points in total, you will lose the game\n")
+print("Notice:AJQK stand for 1,11,12,13 points individually\n")
+you = Player('human')
+bot = Bot('bot1')
+you.get_one(deck.deal())
 you.arrange()
-print('card in your hand', end='')
+print('card in your hand ', end='')
 print(you.cards)
-if you.judge() == 0:
-    print("you lose!")
+"""进行游戏"""
+proxy = True
+while proxy == True :
+    a = str(input("Do you want to draw a card? Y/N "))
+    if a == str('Y') or a == str('y'):
+        you.get_one(deck.deal())
+        you.arrange()
+        print('cards in your hand ', end='')
+        print(you.cards)
+    else:
+        proxy = False
+print(you.judge())
+keep = True
+while keep == True:
+    bot.get_one(deck.deal())
+    bot.arrange()
+    if bot.score() < 21:
+        continue
+    else:
+        keep = False
+print(bot.output())
+if bot.score() > 21:
+    if you.score() <= 21:
+        print("Congratulations! you win the game!")
+        print('cards in your hand ', end='')
+        print(you.cards)
+        print('cards in bot hand', end='')
+        print(bot.cards)
+    else:
+        print("draw game!")
+        print('cards in your hand ', end='')
+        print(you.cards)
+        print('cards in bot hand', end='')
+        print(bot.cards)
 else:
-    print("you got "+ str(you.judge())+" point in total!")
+    if you.score() > 21:
+        print("you lose the game!")
+        print('cards in your hand ', end='')
+        print(you.cards)
+        print('cards in bot hand', end='')
+        print(bot.cards)
+    else:
+        if you.score() >= bot.score():
+           print("Congratulations! you win the game!")
+           print('cards in your hand ', end='')
+           print(you.cards) 
+           print('cards in bot hand', end='')
+           print(bot.cards)
+        else:
+           print("you lose the game!")
+           print('cards in your hand ', end='')
+           print(you.cards) 
+           print('cards in bot hand', end='')
+           print(bot.cards)
