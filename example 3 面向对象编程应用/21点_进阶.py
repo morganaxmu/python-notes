@@ -97,7 +97,7 @@ class Bot(Player):
         
     def output(self):
         return 'bot got 'f'{self.value}'' points in total!'
-   
+
         
 """初始化"""
 deck = Deck()
@@ -107,10 +107,13 @@ print("But if you get over 21 points in total, you will lose the game\n")
 print("Notice:AJQK stand for 1,11,12,13 points individually\n")
 you = Player('human')
 bot = Bot('bot1')
+def result(message):
+        print(message)
+        print('cards in your hand ', you.cards)
+        print('cards in bot hand ', bot.cards)
 you.get_one(deck.deal())
 you.arrange()
-print('card in your hand ', end='')
-print(you.cards)
+print('card in your hand ', you.cards)
 """进行游戏"""
 proxy = True
 while proxy == True :
@@ -118,8 +121,7 @@ while proxy == True :
     if a == str('Y') or a == str('y'):
         you.get_one(deck.deal())
         you.arrange()
-        print('cards in your hand ', end='')
-        print(you.cards)
+        print('cards in your hand ', you.cards)
     else:
         proxy = False
 print(you.judge())
@@ -134,34 +136,14 @@ while keep == True:
 print(bot.output())
 if bot.score() > 21:
     if you.score() <= 21:
-        print("Congratulations! you win the game!")
-        print('cards in your hand ', end='')
-        print(you.cards)
-        print('cards in bot hand', end='')
-        print(bot.cards)
+        result("Congratulations! you win the game!")
     else:
-        print("draw game!")
-        print('cards in your hand ', end='')
-        print(you.cards)
-        print('cards in bot hand', end='')
-        print(bot.cards)
+        result("draw game!")
 else:
     if you.score() > 21:
-        print("you lose the game!")
-        print('cards in your hand ', end='')
-        print(you.cards)
-        print('cards in bot hand', end='')
-        print(bot.cards)
+        result("you lose the game!")
     else:
         if you.score() >= bot.score():
-           print("Congratulations! you win the game!")
-           print('cards in your hand ', end='')
-           print(you.cards) 
-           print('cards in bot hand', end='')
-           print(bot.cards)
+           result("Congratulations! you win the game!")
         else:
-           print("you lose the game!")
-           print('cards in your hand ', end='')
-           print(you.cards) 
-           print('cards in bot hand', end='')
-           print(bot.cards)
+           result("you lose the game!")

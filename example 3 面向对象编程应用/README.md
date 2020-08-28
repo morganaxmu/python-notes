@@ -35,3 +35,17 @@ print(int(a.judge()))
 调整了player的代码，直接用占位符输出文本
 
 现在是一张一张抽，自己决定要不要继续抽，可以人机对战
+
+简化了代码，用result函数传递message之后，打印结果
+
+之前使用了两行代码
+
+```python
+print('cards in your hand ', end='')
+print(you.cards)
+```
+现在合并为
+```python
+print('cards in your hand ', you.cards)
+```
+注意这里不能用“+”，必须用“，”，+会报错：TypeError: can only concatenate str (not "list") to str
