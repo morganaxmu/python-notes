@@ -193,3 +193,301 @@ a+b:
 也就是说，它把dimension不足的部分，直接复制只有1的那一个dimension，然后拓宽，拓宽到两个dimension相同再进行加法。相当于我们要如何把一位数轴上的点进行一个二维操作，比如，我们有一个一维数轴上的点（5），要对他进行二维操作（2，3），也就是x+2,y+3，我们就需要将其补成（5，5），然后再进行操作。
 
 但是，只有1能补，如果一个是（3，2），一个是（3），后者补完变成从（1，3）变成（3，3），两边还是对不齐，就无法操作。
+
+## 2.Pandas
+### 数据的read&write
+pandas可以调用的对象类型很多，Numpy的array等都可以。对数据分析来说，较为常用的是用pandas载入数据为dataframe，就像R里面的read_csv/read_xlxs一样方便，读取函数如下所示，注意路径要与工作路径相匹配：
+```python
+import pandas as pd
+titanic = pd.read_csv("data/titanic.csv")
+#欲查看该dataframe的前8行
+titanic.head(8)
+```
+注意pandas支持提取的时候按照条件提取，也就是说你可以用data[data.index>0]来进行提取
+
+相应的，你也可以write
+```python
+import pandas as pd
+titanic = pd.read_excel('titanic.xlsx', sheet_name='passengers')
+titanic.to_excel('titanic.xlsx', sheet_name='passengers', index=False)
+```
+只需要替换read_和.to_后面的文件类型即可
+### 对象类型
+#### series
+series很好理解，序列，就是一串数，可以把列表转换成序列：
+```python
+import pandas as pd
+data = pd.Series([0.25, 0.5, 0.75, 1.0])
+```
+series可以看成一个N*2的array，其中第一列为0-N；在pandas中创建series的时候可以同时为其index命名（即改变array第一列的内容）
+```python
+import pandas as pd
+data = pd.Series([0.25, 0.5, 0.75, 1.0], index=['a', 'b', 'c', 'd'])
+```
+因为这一特性，我们当然可以把key-value形式的字典也给变成series
+```python
+import pandas as pd
+population_dict = {'California': 38332521,
+                   'Texas': 26448193,
+                   'New York': 19651127,
+                   'Florida': 19552860,
+                   'Illinois': 12882135}
+population = pd.Series(population_dict)
+```
+实际上，series的数据类型是index-value类型，可以通过下列代码来生成series
+```python
+import pandas as pd
+pd.Series(5, index=[100, 200, 300])
+pd.Series({2:'a', 1:'b', 3:'c'})
+```
+#### dataframe
+数据框结构与R里面类似，你可以把它视为series的组合：
+```python
+import pandas as pd
+population_dict = {'California': 38332521,
+                   'Texas': 26448193,
+                   'New York': 19651127,
+                   'Florida': 19552860,
+                   'Illinois': 12882135}
+population = pd.Series(population_dict)
+area_dict = {'California': 423967, 'Texas': 695662, 'New York': 141297,'Florida': 170312, 'Illinois': 149995}
+area = pd.Series(area_dict)
+states = pd.DataFrame({'population': population,'area': area})
+```
+当然，这个合并是因为两个的index都一致，所以就直接合在一起了。dataframe有两个属性，一个是index（行名），一个是columns（列名），都可以通过data.index/data..columns函数调用查看。
+
+自然，你只要有Index和value，就能通过赋予colunms来创建dataframe
+```python
+import pandas as pd
+population_dict = {'California': 38332521,
+                   'Texas': 26448193,
+                   'New York': 19651127,
+                   'Florida': 19552860,
+                   'Illinois': 12882135}
+population = pd.Series(population_
+pd.DataFrame(population, columns=['popula
+data = [{'a': i, 'b': 2 * i}
+        for i in range(3)]
+pd.DataFrame(data)
+pd.DataFrame(np.random.rand(3, 2),
+             columns=['foo', 'bar'],
+             index=['a', 'b', 'c'])
+pd.DataFrame([{'a': 1, 'b': 2}, {'b': 3, 'c': 4}])
+```
+像上述最后一个代码一样，index有abc，但是很显然0C和1A都是缺失的，那么pandas会自动补NaN上去。总而言之，只要满足index\columns\value三个条件就能创建dataframe。
+#### index
+index有点类似元组，它不能被改动
+```python
+import pandas as pd
+ind = pd.Index([2, 3, 5, 7, 11])
+```
+当然这不意味着你不能对其进行操作，你只是不能改变其中的元素罢了
+```python
+import pandas as pd
+indA = pd.Index([1, 3, 5, 7, 9])
+indB = pd.Index([2, 3, 5, 7, 11])
+indA & indB  # intersection
+indA | indB  # union
+indA ^ indB  # symmetric difference
+```
+### 操作
+#### 提取和常规操作
+series只有index-value，所以按照index提取就好；如果要用数字提取也可以。
+
+dataframe同理，但是你可以通过data['new colunms']=来创建新的columns。常见的函数如下列所示：
+```python
+import pandas as pd
+area = pd.Series({'California': 423967, 'Texas': 695662,
+                  'New York': 141297, 'Florida': 170312,
+                  'Illinois': 149995})
+pop = pd.Series({'California': 38332521, 'Texas': 26448193,
+                 'New York': 19651127, 'Florida': 19552860,
+                 'Illinois': 12882135})
+data = pd.DataFrame({'area':area, 'pop':pop})
+data.values
+data.values[0]
+data.T
+data.iloc[:3, :2]
+data.loc[:'Illinois', :'pop']
+data.loc[data.density > 100, ['pop', 'density']]
+data.ix[:3, :'pop']
+```
+在pandas中，有三个特殊的索引函数，分别为loc\iloc\ix；loc通过行标签（index）和列标签（columns)索引，iloc通过对应坐标索引（第一个参数为行，第二个参数为列）
+#### ufuncs of numpy
+numpy经常和pandas一起使用，所以很多numpy的函数可以直接以pandas的series和dataframe为对象操作
+```python
+import pandas as pd
+import numpy as np
+rng = np.random.RandomState(42)
+ser = pd.Series(rng.randint(0, 10, 4))
+df = pd.DataFrame(rng.randint(0, 10, (3, 4)),columns=['A', 'B', 'C', 'D'])
+np.exp(ser)
+np.sin(df * np.pi / 4)
+```
+由于numpy的ufuncs有自动填充的功能，如果你将两个index部分重合的series/dataframe进行操作，完全没有问题，缺失的部分会用NaN填充。如果不想用NaN，可以调用pandas的函数并使用fill_value参数，如下所示：
+```python
+import pandas as pd
+import numpy as np
+A = pd.Series([2, 4, 6], index=[0, 1, 2])
+B = pd.Series([1, 3, 5], index=[1, 2, 3])
+A + B
+A.add(B, fill_value=0)
+```
+在pandas中，其他函数包括：
+|python语法|pandas函数|
+| ---- | ---- |
+|+|add()|
+|-|sub(), subtract()|
+|*|mul(), multiply()|
+|/|truediv(), div(), divide()|
+|//|floordiv()|
+|%|mod()|
+|**|pow()|
+
+因为dataframe相当于series的集合，所以你也可以用dataframe和series进行运算，此时可以通过调用上述函数中的axis函数来确定运算的是行还是列（默认是行，axis=0为列）
+
+### 缺失值处理
+处理缺失值通常有两种方法，mask（面具）和sentinel（哨兵），两者都会有所牺牲，Pandas采用的是后者。Pandas中的缺失值用pd.nan(import pandas as pd)来表示。
+
+在python中，如果用None来表示缺失值，因为None的属性是object，会在执行诸如sum之类的数值运算的函数的时候发生错误；而另一种表示方法是NaN，它的属性则是float，因此可以参与计算——只不过所有结果都是NaN罢了，因此Numpy会有NaN-free的函数比如np.nansum()之类的。
+
+但是在Pandas中不用担心，如果你把series/dataframe中的某一项赋值为None，它会自动转变成NaN，同时把所有int元素转换成float、所有boolean（布尔值）转换成object。Pandas同时还有一系列关于缺失值的函数：
+|函数名|作用|
+| ---- | ---- |
+|isnull()|生成一个（或者系列）布尔值看表示有没有缺失值|
+|notnull()|与上面一个相反|
+|dropna()|返回一个去掉缺失值的data|
+|fillna()|返回一个缺失值被补充的data|
+```python
+data = pd.Series([1, np.nan, 'hello', None])
+data.isnull()
+data[data.notnull()] #直接提取不是null的
+data.dropna()
+df = pd.DataFrame([[1,      np.nan, 2],
+                   [2,      3,      5],
+                   [np.nan, 4,      6]])
+df.dropna() #对dataframe使用的时候，任何行只要有null都会扔掉
+df.dropna(axis='columns') # 设定axis=1或columns可以把扔掉任何有null的列
+df[3] = np.nan
+df.dropna(axis='columns', how='all') #如果不想全扔，设置how='all'扔掉全是null的列
+df.dropna(axis='rows', thresh=3) #或者设置阈值thresh，thresh=3会保留至少有三个非null的列
+# fill的方法有很多
+data = pd.Series([1, np.nan, 2, None, 3], index=list('abcde'))
+data.fillna(0) #全部填0
+data.fillna(method='ffill') # forward-fill，填前一个值
+data.fillna(method='bfill') # back-fill，填后一个值
+df.fillna(method='ffill', axis=1) #也可以对dataframe使用，此时如果用ffill填充，null是第一个的话就会忽略
+```
+### Hierarchical Indexing分层索引
+dataframe是二维的，虽然pandas还有三维的panel（对应paneldata，index-year-value三个维度），但分层索引更常用。
+
+一般来说，可以考虑index由两个元素组成的元组tuple构成，代码如下：
+```python
+import pandas as pd
+import numpy as np
+index = [('California', 2000), ('California', 2010),
+         ('New York', 2000), ('New York', 2010),
+         ('Texas', 2000), ('Texas', 2010)]
+populations = [33871648, 37253956,
+               18976457, 19378102,
+               20851820, 25145561]
+pop = pd.Series(populations, index=index)
+pop[[i for i in pop.index if i[1] == 2010]]
+```
+但是用pandas自带的MultiIndex可以达到相同的效果
+```python
+index = pd.MultiIndex.from_tuples(index)
+pop[:, 2010]
+```
+pandas也可以将多层index的series转换成dataframe，也可以反之
+```python
+pop_df = pop.unstack()
+pop_df.stack()
+```
+当然，分层索引对dataframe是一样有效的
+```python
+pop_df = pd.DataFrame({'total': pop,
+                       'under18': [9267089, 9284094,
+                                   4687374, 4318033,
+                                   5906301, 6879014]})
+df = pd.DataFrame(np.random.rand(4, 2),
+                  index=[['a', 'a', 'b', 'b'], [1, 2, 1, 2]],
+                  columns=['data1', 'data2'])
+```
+创建分层索引的方法有很多。值得一提的是，当index是元组的时候，能自动创建分层索引的series
+```python
+data = {('California', 2000): 33871648,
+        ('California', 2010): 37253956,
+        ('Texas', 2000): 20851820,
+        ('Texas', 2010): 25145561,
+        ('New York', 2000): 18976457,
+        ('New York', 2010): 19378102}
+pd.Series(data)
+# 下列方法都能创建相同的multiindex
+# MultiIndex(levels=[['a', 'b'], [1, 2]],
+#          labels=[[0, 0, 1, 1], [0, 1, 0, 1]])
+pd.MultiIndex.from_arrays([['a', 'a', 'b', 'b'], [1, 2, 1, 2]])
+pd.MultiIndex.from_tuples([('a', 1), ('a', 2), ('b', 1), ('b', 2)])
+pd.MultiIndex.from_product([['a', 'b'], [1, 2]])
+pd.MultiIndex(levels=[['a', 'b'], [1, 2]],
+              labels=[[0, 0, 1, 1], [0, 1, 0, 1]])
+```
+multiindex的.index.names属性有两个，所以切片（slice）的时候要注意；同时不止行可以有multi index，列也可以有：
+```python
+# hierarchical indices and columns
+index = pd.MultiIndex.from_product([[2013, 2014], [1, 2]],
+                                   names=['year', 'visit'])
+columns = pd.MultiIndex.from_product([['Bob', 'Guido', 'Sue'], ['HR', 'Temp']],
+                                     names=['subject', 'type'])
+
+# mock some data
+data = np.round(np.random.randn(4, 6), 1)
+data[:, ::2] *= 10
+data += 37
+
+# create the DataFrame
+health_data = pd.DataFrame(data, index=index, columns=columns)
+health_data
+```
+### 合并数据集
+#### 连环cancatenate和append
+在Numpy中，可以使用np.concatenate()函数来将两个对象进行合并，同一维度的对象会合并在一起。在pandas中也会如此，如下所示：
+```python
+import pandas as pd
+import numpy as np
+def make_df(cols, ind):
+    """Quickly make a DataFrame"""
+    data = {c: [str(c) + str(i) for i in ind]
+            for c in cols}
+    return pd.DataFrame(data, ind)
+ser1 = pd.Series(['A', 'B', 'C'], index=[1, 2, 3])
+ser2 = pd.Series(['D', 'E', 'F'], index=[4, 5, 6])
+pd.concat([ser1, ser2])
+df1 = make_df('AB', [1, 2])
+df2 = make_df('AB', [3, 4])
+display('df1', 'df2', 'pd.concat([df1, df2])')
+# 不指定参数的话，默认会以行为轴合并，也就是新增行为index，列数不变；要按照列来需要axis='col'或=1
+df3 = make_df('AB', [0, 1])
+df4 = make_df('CD', [0, 1])
+display('df3', 'df4', "pd.concat([df3, df4], axis='col')")
+# pandas的合并是会复制index/indices的，即使两个对象的index都是0，1，他也会机械地合并下去
+# 如果要让index按照顺序展开而非复制之前的，需要调整参数
+x = make_df('AB', [0, 1])
+y = make_df('AB', [2, 3])
+y.index = x.index  # make duplicate indices!
+display('x', 'y', 'pd.concat([x, y], ignore_index=True)')
+# 如果要分层index，使用key参数
+display('x', 'y', "pd.concat([x, y], keys=['x', 'y'])")
+# 如果列的index不完全重叠，会产生NaN
+df5 = make_df('ABC', [1, 2])
+df6 = make_df('BCD', [3, 4])
+display('df5', 'df6', 'pd.concat([df5, df6])')
+# 欲忽略NaN，可以调用参数join来指定保留的部分，inner只保留交集，outer反之
+display('df5', 'df6',
+        "pd.concat([df5, df6], join='inner')")
+# 或者可以指定joinaxis，虽然亦会产生NaN
+display('df5', 'df6',
+        "pd.concat([df5, df6], join_axes=[df5.columns])")
+# 使用append()亦可达到和concat相同的效果
+display('df1', 'df2', 'df1.append(df2)')
+```
