@@ -514,6 +514,7 @@ df5 = pd.DataFrame({'group': ['Accounting', 'Accounting',
 pd.merge(df1, df5)
 ```
 df1、df2因为有共通的employee列，所以会自动按照其为基准合并；而合并df3和df4的时候，group是共通的，但是会出现一对多的情况——df3有两个engineering，那么这两个engineering都会得到supervisorGuido；当df1和df5合并的时候，因为出现了多个accounting和engineering的对应项目，则会一同合并为独立的条目，即
+
 |employee|group|skills|
 | ---- | ---- | ---- |
 |Bob|Accounting|math|
@@ -524,6 +525,7 @@ df1、df2因为有共通的employee列，所以会自动按照其为基准合并
 |Lisa|Engineering|linux|
 |Sue|HR|spreadsheets|
 |Sue|HR|organization|
+
 在进行合并的时候，可以对参数进行调整：on参数，用于指定合并时候的基准列；如果两个df没有名字一样的列，可以通过设定left_on, right_on参数来指定基准列；同时由于合并时候，参数how默认为'inner'，合并的时候如果对不上就只会保留交集，可以通过设定为'outer'把对不上的部分变成NaN；在合并的时候，如果有columns name相同且不为基准列，pandas会默认加后缀_x和_y等来区分，如果想自己设定可以修改参数suffixes（如suffixes=["_L", "_R"]）
 
 #### Aggregation&Grouping
