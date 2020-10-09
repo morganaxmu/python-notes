@@ -2,7 +2,7 @@
 Numpy是数据科学常用的package，在Jupyter内可以通过按下tab键获得自动补充建议或者是函数的help信息
 
 ### 1.array
-array是numpy特有的类型，它的主要优势是数据类型的一致性（稍后解释），它可以用常规的list的提取方法（即[start:end:step]来提取）
+array是numpy特有的类型，它的主要优势是数据类型的一致性（稍后解释），它可以用常规的list的提取方法（即[start : end : step]来提取）
 
 np.array是一个比较常用的生成集合的函数
 ```python
@@ -71,7 +71,7 @@ np.empty(3)
 ```
 ### 2.对array进行操作
 
-如前文所述，array可以用常规的list的提取方法（即[start:end:step]来提取），部分方法举例如下如下：
+如前文所述，array可以用常规的list的提取方法（即[start : end : step]来提取），部分方法举例如下如下：
 ```python
 import numpy as np
 big_array = np.random.rand(1000000)
@@ -123,7 +123,9 @@ print(a + b)
 一般来说需要遵守下列规则，Broadcasting in NumPy follows a strict set of rules to determine the interaction between the two arrays:
 
 ** Rule 1 **: If the two arrays differ in their number of dimensions, the shape of the one with fewer dimensions is padded with ones on its leading (left) side. 
+
 ** Rule 2 **: If the shape of the two arrays does not match in any dimension, the array with shape equal to 1 in that dimension is stretched to match the other shape.
+
 ** Rule 3 **: If in any dimension the sizes disagree and neither is equal to 1, an error is raised.
 
 如果想要快速补齐，可以使用.newaxis函数添加一个新的axis：
@@ -491,3 +493,38 @@ display('df5', 'df6',
 # 使用append()亦可达到和concat相同的效果
 display('df1', 'df2', 'df1.append(df2)')
 ```
+#### merge&join
+用pd.merge可以达到合并的效果
+```python
+import pandas as pd
+import numpy as np
+
+df1 = pd.DataFrame({'employee': ['Bob', 'Jake', 'Lisa', 'Sue'],
+                    'group': ['Accounting', 'Engineering', 'Engineering', 'HR']})
+df2 = pd.DataFrame({'employee': ['Lisa', 'Bob', 'Jake', 'Sue'],
+                    'hire_date': [2004, 2008, 2012, 2014]})
+df3 = pd.merge(df1, df2)
+df4 = pd.DataFrame({'group': ['Accounting', 'Engineering', 'HR'],
+                    'supervisor': ['Carly', 'Guido', 'Steve']})
+pd.merge(df3, df4)
+df5 = pd.DataFrame({'group': ['Accounting', 'Accounting',
+                              'Engineering', 'Engineering', 'HR', 'HR'],
+                    'skills': ['math', 'spreadsheets', 'coding', 'linux',
+                               'spreadsheets', 'organization']})
+pd.merge(df1, df5)
+```
+df1、df2因为有共通的employee列，所以会自动按照其为基准合并；而合并df3和df4的时候，group是共通的，但是会出现一对多的情况——df3有两个engineering，那么这两个engineering都会得到supervisorGuido；当df1和df5合并的时候，因为出现了多个accounting和engineering的对应项目，则会一同合并为独立的条目，即
+|employee|group|skills|
+| ---- | ---- | ---- |
+|Bob|Accounting|math|
+|Bob|Accounting|spreadsheets|
+|Jake|Engineering|coding|
+|Jake|Engineering|linux|
+|Lisa|Engineering|coding|
+|Lisa|Engineering|linux|
+|Sue|HR|spreadsheets|
+|Sue|HR|organization|
+在进行合并的时候，可以对参数进行调整：on参数，用于指定合并时候的基准列；如果两个df没有名字一样的列，可以通过设定left_on, right_on参数来指定基准列；同时由于合并时候，参数how默认为'inner'，合并的时候如果对不上就只会保留交集，可以通过设定为'outer'把对不上的部分变成NaN；在合并的时候，如果有columns name相同且不为基准列，pandas会默认加后缀_x和_y等来区分，如果想自己设定可以修改参数suffixes（如suffixes=["_L", "_R"]）
+
+#### Aggregation&Grouping
+
