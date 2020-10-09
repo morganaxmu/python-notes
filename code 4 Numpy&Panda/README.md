@@ -1,4 +1,4 @@
-## 1.Numpy
+## 一.Numpy
 Numpy是数据科学常用的package，在Jupyter内可以通过按下tab键获得自动补充建议或者是函数的help信息
 
 ### 1.array
@@ -196,8 +196,8 @@ a+b:
 
 但是，只有1能补，如果一个是（3，2），一个是（3），后者补完变成从（1，3）变成（3，3），两边还是对不齐，就无法操作。
 
-## 2.Pandas
-### 数据的read&write
+## 二.Pandas
+### 1.数据的read&write
 pandas可以调用的对象类型很多，Numpy的array等都可以。对数据分析来说，较为常用的是用pandas载入数据为dataframe，就像R里面的read_csv/read_xlxs一样方便，读取函数如下所示，注意路径要与工作路径相匹配：
 ```python
 import pandas as pd
@@ -214,7 +214,7 @@ titanic = pd.read_excel('titanic.xlsx', sheet_name='passengers')
 titanic.to_excel('titanic.xlsx', sheet_name='passengers', index=False)
 ```
 只需要替换read_和.to_后面的文件类型即可
-### 对象类型
+### 2.对象类型
 #### series
 series很好理解，序列，就是一串数，可以把列表转换成序列：
 ```python
@@ -292,7 +292,7 @@ indA & indB  # intersection
 indA | indB  # union
 indA ^ indB  # symmetric difference
 ```
-### 操作
+### 3.操作
 #### 提取和常规操作
 series只有index-value，所以按照index提取就好；如果要用数字提取也可以。
 
@@ -348,7 +348,7 @@ A.add(B, fill_value=0)
 
 因为dataframe相当于series的集合，所以你也可以用dataframe和series进行运算，此时可以通过调用上述函数中的axis函数来确定运算的是行还是列（默认是行，axis=0为列）
 
-### 缺失值处理
+### 4.缺失值处理
 处理缺失值通常有两种方法，mask（面具）和sentinel（哨兵），两者都会有所牺牲，Pandas采用的是后者。Pandas中的缺失值用pd.nan(import pandas as pd)来表示。
 
 在python中，如果用None来表示缺失值，因为None的属性是object，会在执行诸如sum之类的数值运算的函数的时候发生错误；而另一种表示方法是NaN，它的属性则是float，因此可以参与计算——只不过所有结果都是NaN罢了，因此Numpy会有NaN-free的函数比如np.nansum()之类的。
@@ -380,7 +380,7 @@ data.fillna(method='ffill') # forward-fill，填前一个值
 data.fillna(method='bfill') # back-fill，填后一个值
 df.fillna(method='ffill', axis=1) #也可以对dataframe使用，此时如果用ffill填充，null是第一个的话就会忽略
 ```
-### Hierarchical Indexing分层索引
+### 5.Hierarchical Indexing分层索引
 dataframe是二维的，虽然pandas还有三维的panel（对应paneldata，index-year-value三个维度），但分层索引更常用。
 
 一般来说，可以考虑index由两个元素组成的元组tuple构成，代码如下：
@@ -451,7 +451,7 @@ data += 37
 health_data = pd.DataFrame(data, index=index, columns=columns)
 health_data
 ```
-### 合并数据集
+### 6.合并数据集
 #### 连环cancatenate和append
 在Numpy中，可以使用np.concatenate()函数来将两个对象进行合并，同一维度的对象会合并在一起。在pandas中也会如此，如下所示：
 ```python
