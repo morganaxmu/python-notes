@@ -46,7 +46,11 @@ def bubblesort(L):
     for i in range(0,n-1):
         for j in range(0,n-1):
             if L[j] > L[j+1]:
-                L[j],L[j+1]=L[j+1],L[j]
+                temp = L[j]
+                L[j] = L[j+1]
+                L[j+1] = temp
     return L
 ```
 操作数量：2(n-1)(n-1)，同阶：n^2，时间复杂度O(n^2)
+
+通过复杂度可以衡量算法的效率，像上述sort其实可以每一次只比较n-i-1个，因为每次比较完可以确保这几个的顺序是对的。时间复杂度从小到大:O(k)<O(logn)<O(n)<O(nlogn)<O(n^2)<O(n^3)<O(2^n)<O(n!)

@@ -528,5 +528,75 @@ df1、df2因为有共通的employee列，所以会自动按照其为基准合并
 
 在进行合并的时候，可以对参数进行调整：on参数，用于指定合并时候的基准列；如果两个df没有名字一样的列，可以通过设定left_on, right_on参数来指定基准列；同时由于合并时候，参数how默认为'inner'，合并的时候如果对不上就只会保留交集，可以通过设定为'outer'把对不上的部分变成NaN；在合并的时候，如果有columns name相同且不为基准列，pandas会默认加后缀_x和_y等来区分，如果想自己设定可以修改参数suffixes（如suffixes=["_L", "_R"]）
 
-#### Aggregation&Grouping
+### 7.Aggregation&Grouping
+#### Aggregation
+Aggregation指如sum()\mean()\median()\min()\max()之类的函数，简单的例子如下：
+```python
+import numpy as np
+import pandas as pd
+rng = np.random.RandomState(42)
+ser = pd.Series(rng.rand(5))
+ser.sum() # 得到总和
+ser.mean() # 得到均值
+df = pd.DataFrame({'A': rng.rand(5),
+                   'B': rng.rand(5)})
+df.mean() # df计算的时候，会给出每列的均值
+df.mean(axis='columns') # 通过调用axis参数，可以得到每行的均值
+df.describe() # 统计性描述
+```
+|Aggregation|Description|
+|count()|Total number of items|
+|first(), last()|First and last item|
+|mean(), median()|Mean and median|
+|min(), max()|Minimum and maximum|
+|std(), var()|Standard deviation and variance|
+|mad()|Mean absolute deviation|
+|prod()|Product of all items|
+|sum()|Sum of all items|
 
+上述是常用的aggregations，也有更灵活的办法，如用.aggregate(['min', np.median, max])来获得三个需要的数据
+
+#### GroupBy: Split, Apply, Combine
+Groupby是pandas的一种特殊的方式，他有三种操作——agg\transform\apply。使用groupby函数首先会生成一个dataframegroupby的特殊数据结构
+```python
+import pandas as pd
+df = pd.DataFrame({'key': ['A', 'B', 'C', 'A', 'B', 'C'],
+                   'data': range(6)}, columns=['key', 'data'])
+df.groupby('key') # 根据key那一列分组
+df.groupby('key').sum() #这个是统计每一个不同的key的组别的data的总和
+```
+当然，可以做进一步操作，比如迭代（Iteration）就可以直接进行
+```python
+import pandas as pd
+import seaborn as sns
+planets = sns.load_dataset('planets')
+for (method, group) in planets.groupby('method'):
+    print("{0:30s} shape={1}".format(method, group.shape))
+```
+其他常规操作如下所示：
+```python
+import numpy as np
+import pandas as pd
+rng = np.random.RandomState(0)
+df = pd.DataFrame({'key': ['A', 'B', 'C', 'A', 'B', 'C'],
+                   'data1': range(6),
+                   'data2': rng.randint(0, 10, 6)},
+                   columns = ['key', 'data1', 'data2'])
+# Aggregation
+df.groupby('key').aggregate(['min', np.median, max])
+df.groupby('key').aggregate({'data1': 'min',
+                             'data2': 'max'})
+# Filtering
+def filter_func(x):
+    return x['data2'].std() > 4
+df.groupby('key').filter(filter_func)
+# Transformation 分组完后，全部按照某个公式替换
+df.groupby('key').transform(lambda x: x - x.mean())
+# Apply 自定义替换的方式
+def norm_by_data2(x):
+    # x is a DataFrame of group values
+    x['data1'] /= x['data2'].sum()
+    return x
+df.groupby('key').apply(norm_by_data2)
+
+```
