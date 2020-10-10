@@ -600,3 +600,29 @@ def norm_by_data2(x):
 df.groupby('key').apply(norm_by_data2)
 
 ```
+注意Groupby了之后是一个集合，如果要使用数据，通常会用.unstack()打开例如：
+```python
+itanic.groupby(['sex', 'class'])['survived'].aggregate('mean').unstack()
+```
+
+#### 数据透视表Pivot Tables
+在Groupby之后，创建pivot tables是一件非常轻松的事情
+```python
+import numpy as np
+import pandas as pd
+import seaborn as sns
+titanic = sns.load_dataset('titanic')
+titanic.pivot_table('survived', index='sex', columns='class')
+# pd.cut可以创建分开的区间，比如pd.cut(data,[0,18,80])就会把数据分为0-18，18-80
+age = pd.cut(titanic['age'], [0, 18, 80])
+titanic.pivot_table('survived', ['sex', age], 'class')
+# pd.qcut则是按照百分位切割，后面参数2表示对半分——50%分位
+fare = pd.qcut(titanic['fare'], 2)
+titanic.pivot_table('survived', ['sex', age], [fare, 'class'])
+# 除此之外还有许多参数
+DataFrame.pivot_table(data, values=None, index=None, columns=None,
+                      aggfunc='mean', fill_value=None, margins=False,
+                      dropna=True, margins_name='All')
+# margins参数为True时，会在下面加一个汇总all；agggunc参数则可调用aggregation函数
+titanic.pivot_table(index='sex', columns='class',
+                    aggfunc={'survived':sum, 'fare':'mean'})
