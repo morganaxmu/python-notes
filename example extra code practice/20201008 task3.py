@@ -24,7 +24,8 @@ while proxy:
     if x < 2 or x > 100000000 :
         print("Enter a number between 2 to 100,000,000 !!!!!!!!!")
     else:
-        print(primefac(x))
+        for i in primefac(x):
+            print(str(i) + '*' ,end=' ')
         proxy = False
 
     

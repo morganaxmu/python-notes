@@ -19,6 +19,8 @@ plt.xlim(x1,x2)
 plt.ylim(y1,y2)
 # 当作图完毕后，显示图形
 plt.show()
+# 在Jupyter notebook中，使用下列参数（写在最前面）
+%matplotlib inline
 # 自动保存图标
 plt.savefig('name.png', bbox_inches='tight')
 # bbox_inches='tight'为裁剪掉图多余的空白
@@ -29,6 +31,7 @@ plt.savefig('name.png', bbox_inches='tight')
 ```python
 plt.plot(x, y, linewidth=5)
 plt.plot(x,y, linestyle='-') # 参数可选：solid'-'，dashed'--'，dashdot'-.'，dotted':'
+plt.axes
 # 要改变颜色，调用color参数
 # 如果需要着色，需要提供一个x和对应的y1\y2，函数会在其区间内着色
 plt.plot(x,y1,c='red',alpha=0.5)
@@ -75,3 +78,5 @@ line_chart.x_labels_major = 时间的列表[::N]
 line_chart.add('图例的名字',X的列表)
 line_chart.render_to_file('文件名.svg')
 ```
+
+## （5）errorbar
