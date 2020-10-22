@@ -12,3 +12,332 @@
 降低维度，比如这个二维的螺旋可以降低为一维的数轴，通过这个办法得到了一个一维轴。
 
 # Introducing Scikit-Learn
+## Data Representation
+### Table
+一个二维的表格。rows称为samples，number of rows为n_samples；同理，columns称为features，number of columns为n_features。
+
+因为这种table是二维的，所以可以把它当作matrix，故称之为features matrix（X），视作多个feature组成的matrix。而每一列，视为target array（y），一个一维Numpy array（或Pandas Series）
+### Estimator API
+步骤如下：
+
+1.Choose a class of model by importing the appropriate estimator class from Scikit-Learn.载入合适的estimator。
+
+2.Choose model hyperparameters by instantiating this class with desired values.通过用所需的值实例化此类来选择模型超参数
+
+3.Arrange data into a features matrix and target vector following the discussion above.
+
+4.Fit the model to your data by calling the fit() method of the model instance.
+
+5.Apply the Model to new data:For supervised learning, often we predict labels for unknown data using the predict() method；For unsupervised learning, we often transform or infer properties of the data using the transform() or predict() method.
+
+接下来进入例子讲解
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+
+rng = np.random.RandomState(42)
+x = 10 * rng.rand(50)
+y = 2 * x - 1 + rng.randn(50)
+plt.scatter(x, y)
+#选择class of model，线性回归就选线性
+from sklearn.linear_model import LinearRegression
+#选择hyperparameter，考虑下列问题：
+#Would we like to fit for the offset (i.e., y-intercept)? 需要截距嘛
+#Would we like the model to be normalized?需要正态化嘛
+#Would we like to preprocess our features to add model flexibility?
+#What degree of regularization would we like to use in our model?
+#How many model components would we like to use?
+model = LinearRegression(fit_intercept=True)
+#得到LinearRegression(copy_X=True, fit_intercept=True, n_jobs=1, normalize=False)
+#Arrange data into a features matrix and target vector，y是n_samples长度的array了，但是x不是matrix，所以要改
+X = x[:, np.newaxis]
+#fit
+model.fit(X, y)
+model.coef_
+model.intercept_
+#predict，注意预测的输入数据也要是matrix
+xfit = np.linspace(-1, 11)
+Xfit = xfit[:, np.newaxis]
+yfit = model.predict(Xfit)
+plt.scatter(x, y)
+plt.plot(xfit, yfit)
+```
+也就是说，选择好import什么model之后，选择hyperparameter（见下一章），再把数据处理成X-matrix，y-array，然后就扔进去fit，fit完了可以predict。一般来说用下列函数spilit并测试结果
+```python
+from sklearn.cross_validation import train_test_split
+Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, random_state=0)
+from sklearn.naive_bayes import GaussianNB
+model = GaussianNB()
+model.fit(Xtrain, ytrain)
+y_model = model.predict(Xtest)
+from sklearn.metrics import accuracy_score
+accuracy_score(ytest, y_model)
+```
+想看结果偏差在哪，可以用confusion_matrix，非对角线上的格子就表示预测出错的
+```python
+from sklearn.metrics import confusion_matrix
+
+mat = confusion_matrix(ytest, y_model)
+
+sns.heatmap(mat, square=True, annot=True, cbar=False)
+plt.xlabel('predicted value')
+plt.ylabel('true value');
+```
+
+# Hyperparameters and Model Validation
+## Model Validation
+model validation: after choosing a model and its hyperparameters, we can estimate how effective it is by applying it to some of the training data and comparing the prediction to the known value.
+
+### holdout set
+holdout set: hold back some subset of the data from the training of the model, and then use this holdout set to check the model performance. 可以使用train_test_split（Scikit-Learn）来进行数据分割:
+```python
+from sklearn.cross_validation import train_test_split
+# split the data with 50% in each set
+X1, X2, y1, y2 = train_test_split(X, y, random_state=0,
+                                  train_size=0.5)
+
+# fit the model on one set of data
+model.fit(X1, y1)
+
+# evaluate the model on the second set of data
+y2_model = model.predict(X2)
+accuracy_score(y2, y2_model)
+```
+### cross-validation
+但是holdout set有一个不好的地方就在于它只用了一部分数据来训练，可能会导致训练集太小等问题。所以用cross-validation:to do a sequence of fits where each subset of the data is used both as a training set and as a validation set.
+```python
+from sklearn.cross_validation import train_test_split
+# split the data with 50% in each set
+X1, X2, y1, y2 = train_test_split(X, y, random_state=0,
+                                  train_size=0.5)
+y2_model = model.fit(X1, y1).predict(X2)
+y1_model = model.fit(X2, y2).predict(X1)
+accuracy_score(y1, y1_model), accuracy_score(y2, y2_model)
+```
+更简化的方法是用SKLEAN的cross_val_score：
+```python
+from sklearn.cross_validation import cross_val_score
+cross_val_score(model, X, y, cv=5)
+```
+这是课上讲过的cross validation，还有种极端方法就是每次只抽一个的leave-one-out cross validation：
+```python
+from sklearn.cross_validation import LeaveOneOut
+scores = cross_val_score(model, X, y, cv=LeaveOneOut(len(X)))
+print(scores)
+scores.mean()
+```
+## 选择最优模型
+### The Bias-variance trade-off
+如果模型太简单，那么bias就会很高（比如一大堆点，你一条直线），预测偏差大；但是如果模型很复杂，variance就会很高（比如你用无穷级数拟合一条曲线完美过每个点），太贴近训练集就没有预测的意义，偏差更大。
+
+underfit the data: that is, it does not have enough model flexibility to suitably account for all the features in the data; another way of saying this is that the model has high bias（attempts to find a straight-line fit through the data. Because the data are intrinsically more complicated than a straight line, the straight-line model will never be able to describe this dataset well）
+
+overfit the data: that is, it has so much model flexibility that the model ends up accounting for random errors as well as the underlying data distribution; another way of saying this is that the model has high variance.（attempts to fit a high-order polynomial through the data. Here the model fit has enough flexibility to nearly perfectly account for the fine features in the data, but even though it very accurately describes the training data, its precise form seems to be more reflective of the particular noise properties of the data rather than the intrinsic properties of whatever process generated that data.）
+
+R^2，coefficient of determination, which measures how well a model performs relative to a simple mean of the target values.high-bias的模型，validation set的表现和训练集差不多；high-variance的模型，validation set的表现会差得多。
+
+![](validation-curve.png)
+
+从validation curve可以得知：
+
+1）training score总是高于validation score的，因为模型总是比起没见过的和见过的更fit
+
+2）low model complexity(high-bias)时，under-fit，对training data和没见过的预测都很差
+
+3）high model complexity(high-variance)时，over-fit，模型预测training data好，没见过的差
+
+4）在中间的时候validation curve达到最大值，此时This level of complexity indicates a suitable trade-off between bias and variance.
+
+### validation curve
+用pipeline把a simple linear regression 和the polynomial preprocessor结合起来
+```python
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import make_pipeline
+
+def PolynomialRegression(degree=2, **kwargs):
+    return make_pipeline(PolynomialFeatures(degree),
+                         LinearRegression(**kwargs))
+import numpy as np
+
+def make_data(N, err=1.0, rseed=1):
+    # randomly sample the data
+    rng = np.random.RandomState(rseed)
+    X = rng.rand(N, 1) ** 2
+    y = 10 - 1. / (X.ravel() + 0.1)
+    if err > 0:
+        y += err * rng.randn(N)
+    return X, y
+
+X, y = make_data(40)
+import matplotlib.pyplot as plt
+import seaborn; seaborn.set()  # plot formatting
+
+X_test = np.linspace(-0.1, 1.1, 500)[:, None]
+
+plt.scatter(X.ravel(), y, color='black')
+axis = plt.axis()
+for degree in [1, 3, 5]:
+    y_test = PolynomialRegression(degree).fit(X, y).predict(X_test)
+    plt.plot(X_test.ravel(), y_test, label='degree={0}'.format(degree))
+plt.xlim(-0.1, 1.0)
+plt.ylim(-2, 12)
+plt.legend(loc='best')
+```
+上述代码并不能确定degree of the polynomial，因为就做了三条，要确定degree of ploynomial以得到合适的trade-off between bias (under-fitting) and variance (over-fitting)，可以用包自带的validation_curve。
+```python
+from sklearn.learning_curve import validation_curve
+degree = np.arange(0, 21)
+train_score, val_score = validation_curve(PolynomialRegression(), X, y,
+                                          'polynomialfeatures__degree', degree, cv=7)
+
+plt.plot(degree, np.median(train_score, 1), color='blue', label='training score')
+plt.plot(degree, np.median(val_score, 1), color='red', label='validation score')
+plt.legend(loc='best')
+plt.ylim(0, 1)
+plt.xlabel('degree')
+plt.ylabel('score')
+# 从图上看出3是最好的
+plt.scatter(X.ravel(), y)
+lim = plt.axis()
+y_test = PolynomialRegression(3).fit(X, y).predict(X_test)
+plt.plot(X_test.ravel(), y_test);
+plt.axis(lim)
+```
+## Learning Curves
+```python
+X2, y2 = make_data(200)
+plt.scatter(X2.ravel(), y2)
+degree = np.arange(21)
+train_score2, val_score2 = validation_curve(PolynomialRegression(), X2, y2,
+                                            'polynomialfeatures__degree', degree, cv=7)
+
+plt.plot(degree, np.median(train_score2, 1), color='blue', label='training score')
+plt.plot(degree, np.median(val_score2, 1), color='red', label='validation score')
+plt.plot(degree, np.median(train_score, 1), color='blue', alpha=0.3, linestyle='dashed')
+plt.plot(degree, np.median(val_score, 1), color='red', alpha=0.3, linestyle='dashed')
+plt.legend(loc='lower center')
+plt.ylim(0, 1)
+plt.xlabel('degree')
+plt.ylabel('score')
+```
+从图可以得到结果：对给定的复杂度，小样本会overfit（training socre高了，validation score低了）；大样本会underfit（training score低了，validation score高了）；一般而言training总是比validation要高的，也就是说两个curve不应该会交叉。
+
+当然，Sklearn提供了便利的方式来做learning_curve
+```python
+from sklearn.learning_curve import learning_curve
+
+fig, ax = plt.subplots(1, 2, figsize=(16, 6))
+fig.subplots_adjust(left=0.0625, right=0.95, wspace=0.1)
+
+for i, degree in enumerate([2, 9]):
+    N, train_lc, val_lc = learning_curve(PolynomialRegression(degree),
+                                         X, y, cv=7,
+                                         train_sizes=np.linspace(0.3, 1, 25))
+
+    ax[i].plot(N, np.mean(train_lc, 1), color='blue', label='training score')
+    ax[i].plot(N, np.mean(val_lc, 1), color='red', label='validation score')
+    ax[i].hlines(np.mean([train_lc[-1], val_lc[-1]]), N[0], N[-1],
+                 color='gray', linestyle='dashed')
+
+    ax[i].set_ylim(0, 1)
+    ax[i].set_xlim(N[0], N[-1])
+    ax[i].set_xlabel('training size')
+    ax[i].set_ylabel('score')
+    ax[i].set_title('degree = {0}'.format(degree), size=14)
+    ax[i].legend(loc='best')
+```
+# Feature Engineering
+## Categorical Features
+要用one-hot encoding的话，用DictVectorizer即可
+```python
+data = [
+    {'price': 850000, 'rooms': 4, 'neighborhood': 'Queen Anne'},
+    {'price': 700000, 'rooms': 3, 'neighborhood': 'Fremont'},
+    {'price': 650000, 'rooms': 3, 'neighborhood': 'Wallingford'},
+    {'price': 600000, 'rooms': 2, 'neighborhood': 'Fremont'}
+]
+from sklearn.feature_extraction import DictVectorizer
+vec = DictVectorizer(sparse=False, dtype=int)
+vec.fit_transform(data)
+```
+自动把三个neighborhood参数转换成了三个01变量，即'neighborhood=Fremont', 'neighborhood=Queen Anne', 'neighborhood=Wallingford'
+## Text Features
+可以用CountVectorizer来把文本的每一个都拆成01变量，来统计
+```python
+sample = ['problem of evil',
+          'evil queen',
+          'horizon problem']
+from sklearn.feature_extraction.text import CountVectorizer
+
+vec = CountVectorizer()
+X = vec.fit_transform(sample)
+import pandas as pd
+pd.DataFrame(X.toarray(), columns=vec.get_feature_names())
+```
+对文本来说，如果用上述的拆分，会出现一点问题那就是只会按照有没有拆，不够直观。对于文本，我们总是更想统计它出现的频率，因此可以使用term frequency-inverse document frequency（TF-IDF）来做weights
+```python
+sample = ['problem of evil',
+          'evil queen',
+          'horizon problem']
+from sklearn.feature_extraction.text import TfidfVectorizer
+vec = TfidfVectorizer()
+X = vec.fit_transform(sample)
+pd.DataFrame(X.toarray(), columns=vec.get_feature_names())
+```
+## Derived Features
+一个非常简单的方法，当x不好描述的时候，用polynomialfeatures把高次项加进去来预测
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+x = np.array([1, 2, 3, 4, 5])
+y = np.array([4, 2, 1, 3, 7])
+plt.scatter(x, y)
+from sklearn.linear_model import LinearRegression
+X = x[:, np.newaxis]
+model = LinearRegression().fit(X, y)
+yfit = model.predict(X)
+plt.scatter(x, y)
+plt.plot(x, yfit)
+from sklearn.preprocessing import PolynomialFeatures
+poly = PolynomialFeatures(degree=3, include_bias=False)
+X2 = poly.fit_transform(X)
+print(X2)
+model = LinearRegression().fit(X2, y)
+yfit = model.predict(X2)
+plt.scatter(x, y)
+plt.plot(x, yfit)
+```
+## Imputation of Missing Data
+When applying a typical machine learning model to such data, we will need to first replace such missing data with some appropriate fill value. This is known as imputation of missing values, and strategies range from simple (e.g., replacing missing values with the mean of the column) to sophisticated (e.g., using matrix completion or a robust model to handle such data).
+
+最基础的imputation方法是用mean,median或者众数来填充NaN,Sklearn有专门的Imputer class可以用
+```python
+from numpy import nan
+X = np.array([[ nan, 0,   3  ],
+              [ 3,   7,   9  ],
+              [ 3,   5,   2  ],
+              [ 4,   nan, 6  ],
+              [ 8,   8,   1  ]])
+y = np.array([14, 16, -1,  8, -5])
+from sklearn.preprocessing import Imputer
+imp = Imputer(strategy='mean')
+X2 = imp.fit_transform(X)
+print(X2)
+model = LinearRegression().fit(X2, y)
+model.predict(X2)
+```
+## Feature Pipelines
+当上述步骤你都要搞一遍的时候，比如先Impute missing values using the mean再Transform features to quadratic最后Fit a linear regression，都做一遍太傻了，可以用Sklearn的Pipeline object来合并一起搞
+```python
+from sklearn.pipeline import make_pipeline
+
+model = make_pipeline(Imputer(strategy='mean'),
+                      PolynomialFeatures(degree=2),
+                      LinearRegression())
+model.fit(X, y)  # X with missing values, from above
+print(y)
+print(model.predict(X))
+```
