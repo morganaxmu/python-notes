@@ -3,7 +3,8 @@ seaborn包基于matplotlib包，其可执行的操作包括：1. 单变量分布
 # 1.单变量分布
 单变量分布的话，就是直接直方图hist+概率分布曲线了。如果不想要hist可以调用参数hist= False只留下分布曲线
 ```python
-x = np.random.randon(200)
+from numpy import random
+x = random.rand(200)
 sns.distplot(x)
 ```
 
