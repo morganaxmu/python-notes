@@ -693,3 +693,59 @@ from sklearn.ensemble import RandomForestClassifier
 model = RandomForestClassifier(n_estimators=100, random_state=0)
 visualize_classifier(model, X, y)
 ```
+# Support Vector Machines
+比起简单来说用一个0宽的线来区分不同的classes，用带margin的线（相当于Confidencial Interval）来划分。先载入环境
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+# use seaborn plotting defaults
+import seaborn as sns; sns.set()
+```
+要使用SVC，直接从Sklearn里面拿就好了
+```python
+from sklearn.svm import SVC # "Support vector classifier"
+model = SVC(kernel='linear', C=1E10)
+model.fit(X, y)
+```
+kernel function有很多选择，linear为线性模型，这样出来的margin就是线。support vectors储存在``support_vectors_`` attribute of the classifier中
+```python
+model.support_vectors_
+```
+一般来说，当遇到non-separated dataset的时候，线性分割不太能割开。这个时候就需要升维到高一维度来找新的plane去切。这样在二维上不好用直线来表示，用曲线会比较好。这个时候就需要把kernel参数改为RBF (radial basis function)
+```python
+clf = SVC(kernel='rbf', C=1E6)
+clf.fit(X, y)
+def plot_svc_decision_function(model, ax=None, plot_support=True):
+    """Plot the decision function for a 2D SVC"""
+    if ax is None:
+        ax = plt.gca()
+    xlim = ax.get_xlim()
+    ylim = ax.get_ylim()
+    
+    # create grid to evaluate model
+    x = np.linspace(xlim[0], xlim[1], 30)
+    y = np.linspace(ylim[0], ylim[1], 30)
+    Y, X = np.meshgrid(y, x)
+    xy = np.vstack([X.ravel(), Y.ravel()]).T
+    P = model.decision_function(xy).reshape(X.shape)
+    
+    # plot decision boundary and margins
+    ax.contour(X, Y, P, colors='k',
+               levels=[-1, 0, 1], alpha=0.5,
+               linestyles=['--', '-', '--'])
+    
+    # plot support vectors
+    if plot_support:
+        ax.scatter(model.support_vectors_[:, 0],
+                   model.support_vectors_[:, 1],
+                   s=300, linewidth=1, facecolors='none');
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
+plt.scatter(X[:, 0], X[:, 1], c=y, s=50, cmap='autumn')
+plot_svc_decision_function(clf)
+plt.scatter(clf.support_vectors_[:, 0], clf.support_vectors_[:, 1],
+            s=300, lw=1, facecolors='none')
+```
+而SVC中的参数C，作为惩罚项，C越小对离群值越宽容（意味着boundary中会包含更多离群值），boundary也就会越宽

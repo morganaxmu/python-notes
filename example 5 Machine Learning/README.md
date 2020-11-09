@@ -9,3 +9,6 @@
 
 # Random forests
 见对应py文件
+
+# Support Vector Machines
+因为是从Jupiter notebook抄的代码，所以部分图会黏在一起，这个时候需要加一行plt.clf()来拆开
