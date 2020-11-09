@@ -749,3 +749,17 @@ plt.scatter(clf.support_vectors_[:, 0], clf.support_vectors_[:, 1],
             s=300, lw=1, facecolors='none')
 ```
 而SVC中的参数C，作为惩罚项，C越小对离群值越宽容（意味着boundary中会包含更多离群值），boundary也就会越宽
+
+要找到最合适的C可以直接用grid Search,然后调用best_params_来获取最佳参数。因为本身是用了CV（cross-validation）的方法，所以也可以调用attribution来获得对应的结果
+```python
+model = SVC(kernel='linear')
+parameters = {
+              'C': [0.1, 1, 10, 100, 0.005],
+             }
+gridsearch = GridSearchCV(estimator=model, param_grid=parameters, cv=5)
+gridsearch.fit(datapoints, labels)
+Print(gridsearch.best_params_, gridsearch.cv_results_['mean_test_score'],gridsearch.cv_results_['params'])
+```
+对于rbf的kernel，还有一个参数叫做gamma。其也可以用grid search来找到最优值
+
+当然，当kernel='poly'的时候也能用。poly用的时候较少，一般non-sep的用RBF就可以了，当数据又是non-sep，又有部分犬牙交错黏在一起的时候用poly会好一点
