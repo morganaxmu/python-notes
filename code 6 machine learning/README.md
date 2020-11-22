@@ -92,7 +92,7 @@ model validation: after choosing a model and its hyperparameters, we can estimat
 ### holdout set
 holdout set: hold back some subset of the data from the training of the model, and then use this holdout set to check the model performance. 可以使用train_test_split（Scikit-Learn）来进行数据分割:
 ```python
-from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
 # split the data with 50% in each set
 X1, X2, y1, y2 = train_test_split(X, y, random_state=0,
                                   train_size=0.5)
@@ -107,7 +107,7 @@ accuracy_score(y2, y2_model)
 ### cross-validation
 但是holdout set有一个不好的地方就在于它只用了一部分数据来训练，可能会导致训练集太小等问题。所以用cross-validation:to do a sequence of fits where each subset of the data is used both as a training set and as a validation set.
 ```python
-from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
 # split the data with 50% in each set
 X1, X2, y1, y2 = train_test_split(X, y, random_state=0,
                                   train_size=0.5)
@@ -117,7 +117,7 @@ accuracy_score(y1, y1_model), accuracy_score(y2, y2_model)
 ```
 更简化的方法是用SKLEAN的cross_val_score：
 ```python
-from sklearn.cross_validation import cross_val_score
+from sklearn.model_selection import cross_val_score
 cross_val_score(model, X, y, cv=5)
 ```
 这是课上讲过的cross validation，还有种极端方法就是每次只抽一个的leave-one-out cross validation：
