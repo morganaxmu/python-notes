@@ -1,3 +1,17 @@
+seaborn比较好用。如果你是continuous的data，比较适合用pairgrid
+```python
+import seaborn as sns
+g = sns.PairGrid(data, hue='classenc')
+g.map_diag(plt.hist)
+
+g.map_offdiag(plt.scatter, alpha=0.1)
+```
+如果是categorical的，那么比较适合用stripplot
+```python
+import seaborn as sns
+sns.stripplot(x=data['classenc'], y=data['b7'])
+```
+
 seaborn包基于matplotlib包，其可执行的操作包括：1. 单变量分布可视化(distplot) 2. 双变量分布可视化(jointplot) 3. 数据集中成对双变量分布(pairplot) 4. 双变量-三变量散点图(relplot) 5. 双变量-三变量连线图(relplot) 6. 双变量-三变量简单拟合 7. 分类数据的特殊绘图
 
 # 1.单变量分布
