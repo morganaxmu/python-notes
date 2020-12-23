@@ -94,4 +94,13 @@ line_chart.add('图例的名字',X的列表)
 line_chart.render_to_file('文件名.svg')
 ```
 
-## （5）errorbar
+## （5）柱状图
+柱状图最简单了
+```
+import matplotlib.pyplot as plt
+
+name_list= ['Monday','Tuesday','Friday','Sunday']
+num_list = [1.5,0.6,7.8,6]
+plt.bar(range(len(num_list)), num_list,color='rgb',tick_label=name_list)
+plt.show()
+```
