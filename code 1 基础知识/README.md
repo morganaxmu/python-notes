@@ -350,7 +350,7 @@ items.insert(2, 'c')
 items = ['a', 'b', 'c', 'd']
 # 删除指定的元素
 items.remove('a')
-# 删除指定索引位置的元素,pop会返回删除的元素
+# 删除指定索引位置的元素,pop会返回删除的元素，如果不填默认删最后一个，也就是.pop()=.pop(-1)
 items.pop(len(items) - 1)
 # 清空列表中的元素
 items.clear()
@@ -496,4 +496,15 @@ stocks = {
 }
 stocks2 = {key: value for key, value in stocks.items() if value > 100}
 print(stocks2)
+```
+
+## 6.集合
+集合有天然的去重性，也就是里面的元素是可以使用set()即可把list之类的转换成集合。集合可以直接进行减法运算，如下所示
+```python
+M = [2, 2, 0, 5, 3, 5, 7, 4]
+B = [2, 5, 3, 5, 7, 4]
+C = set(M)-set(B)
+print(C.pop()) #pop不填会默认pop(-1)
+M.remove(C.pop())
+## 0
 ```
