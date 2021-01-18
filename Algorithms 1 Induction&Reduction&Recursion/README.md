@@ -145,3 +145,56 @@ def counting_sort(A, key=lambda x: x):
 这里解释一下，首先生成了一个类似字典的列表，然后第一个循环把未排序的列表的所有元素以key-value的形式储存进了这个列表。也就是说，对于需要排序的数字，那么就令对于key的value为这个数字。比如排序[3,2,5]，那么就会得到[[2,2],[3,3],[4,][5,5]]这么一个相当于已经排序好了的东西。.extend方法会在末尾追加，而对类似字典的列表C来说，min和max会取已经有的key里面的最大最小的，这样就可以用线性的算法生成排序好的列表。
 
 ## The Celebrity Problem
+Celebrity，也就是名人，特征是虽然他不认识其他人但是大家都认识他。写程序实现那就是一个一个遍历过去，看看是不是每个人都认识他并且他不认识每个人。可以用一个列表储存一系列列表，每个人都有一个列表用于储存他认识的人。简单的解法如下：
+
+```python
+def naive_celeb(G):
+    n = len(G)
+    for u in range(n): # For every candidate...
+        for v in range(n): # For everyone else...
+            if u == v: continue # Same person? Skip.
+            if G[u][v]: break # Candidate knows other
+            if not G[v][u]: break # Other doesn't know candidate
+        else:
+            return u # No breaks? Celebrity!
+    return None # Couldn't find anyone
+
+from random import randrange
+n = 100
+G = [[randrange(2) for i in range(n)] for i in range(n)]
+c = randrange(n)
+for i in range(n):
+    G[i][c] = True
+    G[c][i] = False
+print(naive_celeb(G))
+```
+很明显这个是quadratic的，还可以改进算法，
+```python
+def celeb(G):
+    n = len(G)
+    u, v = 0, 1 # The first two
+    for c in range(2,n+1): # Others to check
+        if G[u][v]: u = c # u knows v? Replace u
+        else: v = c # Otherwise, replace v
+    if u == n: c = v # u was replaced last; use v
+    else: c = u # Otherwise, u is a candidate
+    for v in range(n): # For everyone else...
+        if c == v: continue # Same person? Skip.
+        if G[c][v]: break # Candidate knows other
+        if not G[v][c]: break # Other doesn't know candidate
+    else:
+        return c # No breaks? Celebrity!
+    return None # Couldn't find anyone
+```
+首先，给定一个初始的u和v，如果G[u][v]为1，说明u认识v，那么就替换掉u，看看别人是不是认识v;如果为0，那么说明u不认识v，v就不可能是名人，那就替换掉v，继续下一个候选人c。第二步，检查我们找到的这个c是不是名人，如果u=n那就说明到最后一个了，根据前述推理这说明u不会是名人，在接下来的步骤里就用v代替c；反之，用u代替c。接着进行检查，这个c是不是满足名人的条件，如果是那就return。
+
+## Topological Sorting
+finding an ordering that respect the dependencies (so that all the edges point forward in the ordering) is called topological sorting. directed acyclic graph (DAG)是只要用箭头表示dependencies的图都可以，但是topological sorting必须箭头都向右。
+
+就像安装软件一样，如果你缺了必须的库/环境那肯定不行，这种安装顺序就是topologically sorted order
+
+这里的代码因为没给input所以是没办法输入的（我也不知道输入该长啥样），第一种思路就是，假设L是存放结果的列表，先找到那些入度为零的节点，把这些节点放到L中，因为这些节点没有任何的父节点。然后把与这些节点相连的边从图中去掉，再寻找图中的入度为零的节点。对于新找到的这些入度为零的节点来说，他们的父节点已经都在L中了，所以也可以放入L。重复上述操作，直到找不到入度为零的节点。如果此时L中的元素个数和节点总数相同，说明排序完成；如果L中的元素个数和节点总数不同，说明原图中存在环，无法进行拓扑排序。
+
+也就是说，我们只要找到一个入度为0的节点，我们就能移除它因为它一定不依赖于其他节点。所以化简的办法就是counting。
+
+# Stronger Assumptions
