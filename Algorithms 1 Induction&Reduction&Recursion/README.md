@@ -198,3 +198,25 @@ finding an ordering that respect the dependencies (so that all the edges point f
 也就是说，我们只要找到一个入度为0的节点，我们就能移除它因为它一定不依赖于其他节点。所以化简的办法就是counting。
 
 # Stronger Assumptions
+有的时候n-1和n之间没有关系，就需要更强的假设
+
+# Invariants and Correctness
+A loop invariant is something that is true after each iteration of a loop, given some preconditions (it’s called an invariant because it doesn’t vary—it’s true from beginning to end).循环不变量，每一次迭代的时候都为TRUE。这玩意儿可以用来证明correctness。
+
+# Relaxation and Gradual Improvement
+relaxation就是solving a problem by getting better and better approximations for the optimal solutions，现在用来描述the crucial step in several algorithms。举个简单的例子，计算最优时间路线的时候，C[v] = min(C[v], A[u] + B[u][v])就是一个relax。
+
+Designing algorithms with relaxation can be like a game. Each relaxation is one “move,” and you try to get the optimal solution with as few moves as possible. You can always get there by just relaxing all over the place, but the key lies in performing your moves in the right order. 
+
+# Reduction + Contraposition = Hardness Proof
+11章的内容，problem complexity。contraposition是逆否命题，也就是说，我们知道通过reduction，B很简单那么原来的A也很简单，但是A很难你再这么reduceB也会很难。
+
+If you can (easily) reduce A to B, then B is at least as hard as A. If you want to show that X is hard and you know that Y is hard, reduce Y to X.
+
+# Problem Solving Advice
+## Make sure you really understand the problem
+What is the input? The output? What’s the precise relationship between the two? Try to represent the problem instances as familiar structures, such as sequences or graphs. A direct, brute-force solution can sometimes help clarify exactly what the problem is.
+## Look for a reduction
+Can you transform the input so it works as input for another problem that you can solve? Can you transform the resulting output so that you can use it? Can you reduce an instance if size n to an instance of size k < n and extend the recursive solution (inductive hypothesis) back to n?
+## Are there extra assumptions you can exploit?
+Integers in a fixed value range can be sorted more efficiently than arbitrary values. Finding the shortest path in a DAG is easier than in an arbitrary graph, and using only non-negative edge weights is often easier than arbitrary edge weights.
