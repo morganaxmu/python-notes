@@ -1,0 +1,1 @@
+Traversal，遍历，discovering&visiting所有节点。当你把问题转变为图像问题的时候，往往会更简单。图像算法中，遍历非常普遍，
