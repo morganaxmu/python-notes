@@ -86,5 +86,67 @@ stopwords.words('english')
 # 英语里的stopwords
 ```
 
-85
+除了wordlist形式之外，还有table (or spreadsheet)格式的。比如nltk.corpus.cmudict.entries()的table格式是一个(word,pronunciation)的集合，提取的时候可以用for word, pron in entries来提取。
 
+此外还有Comparative Wordlists。比如nltk.corpus里的Swadesh是一个多语言的常用词库，可以指定某两种语言然后提取字典，之后把别的语言的结果update进去，就可以比较结果。
+
+# WordNet
+WordNet is a semantically oriented dictionary of English, similar to a traditional thesaurus but with a richer structure.
+
+synonyms-同义词，synset-同义词集。使用.synsets()会返回string对象对应的synset对象。synset的结构是：word.词性.number。对于synset对象，可以如下所示调用出所包含的lemma的对象、其名字、该synset的定义、例子
+```python
+from nltk.corpus import wordnet as wn
+print(wn.synsets('motorcar'))
+print(wn.synset('car.n.01').lemma_names(),'\n',
+      wn.synset('car.n.01').definition(),'\n',
+      wn.synset('car.n.01').examples(),'\n',
+      wn.synset('car.n.01').lemmas())
+```
+This pairing of a synset with a word is called a lemma. lemma的调用方法和synset差不多，如下所示
+```python
+print(wn.lemma('car.n.01.automobile'),'\n',
+      wn.lemma('car.n.01.automobile').synset(),'\n',
+      wn.lemma('car.n.01.automobile').name(),'\n',
+      wn.lemmas('car'))
+```
+synset是有金字塔型的结构的，hyponyms（下级词），most general hypernyms (or root hypernyms)，可以使用.root_hypernyms()查看；普通的用.hypernyms()即可
+
+### lexical relationsh
+Hypernyms and hyponyms are called lexical relations because they relate one synset to another.简单来说就是不同的下位词之间也有关系。For example, the parts of a tree are its trunk, crown, and so on; these are the part_meronyms(). The substance a tree is made of includes heartwood and sapwood, i.e., the substance_meronyms(). A collection of trees forms a forest, i.e., the member_holonyms()
+
+除了上述三个关系之外：the act of walking involves the act of stepping, so walking entails stepping，用.entaiments()来调用。用.antonyms()来调用反义词。
+
+反正不知道的时候如下所示调用看遗言即可
+```python
+print(dir(wn.synset('harmony.n.02')))
+```
+
+因为不同的synset可能会有相同的hyponyms，所以有的时候需要查看：
+```
+>>> right = wn.synset('right_whale.n.01')
+>>> orca = wn.synset('orca.n.01')
+>>> minke = wn.synset('minke_whale.n.01')
+>>> tortoise = wn.synset('tortoise.n.01')
+>>> novel = wn.synset('novel.n.01')
+>>> right.lowest_common_hypernyms(minke)
+[Synset('baleen_whale.n.01')]
+>>> right.lowest_common_hypernyms(orca)
+[Synset('whale.n.02')]
+>>> right.lowest_common_hypernyms(tortoise)
+[Synset('vertebrate.n.01')]
+>>> right.lowest_common_hypernyms(novel)
+[Synset('entity.n.01')]
+```
+
+对于不同的synset，可以查看其深度（越specific深度越大，越大的概念深度越小所以叫root），用.min_depth()
+可以查看深度。同时可以根据path的相似程度来查看两个词的近义程度
+```
+>>> right.path_similarity(minke)
+0.25
+>>> right.path_similarity(orca)
+0.16666666666666666
+>>> right.path_similarity(tortoise)
+0.076923076923076927
+>>> right.path_similarity(novel)
+0.043478260869565216
+```
