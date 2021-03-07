@@ -129,6 +129,13 @@ set(w.lower() for w in text)
 
 有的时候会用到stemmer以去掉同一个词的词尾affixes（也就是说把lying转换回lie），最常用的nltk.PorterStemmer()。而WordNet lemmatizer也会去掉词尾，但是它只会处理已经在字典里面的（比如里面有women和woman，那就会处理women；里面有lying没有lie就不会处理lying）The WordNet lemmatizer is a good choice if you want to compile the vocabulary of some texts and want a list of valid lemmas (or lexicon headwords).
 
+```python
+# lemmatizer
+wnl = nltk.WordNetLemmatizer()
+tokens = [wnl.lemmatize(t) for t in tokens]
+
+```
+
 # Regular Expressions for Tokenizing Text
 Tokenization is the task of cutting a string into identifiable linguistic units that constitute a piece of language data.
 
