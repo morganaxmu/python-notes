@@ -101,7 +101,16 @@ input = open('t2.pkl', 'rb')
 tagger = load(input)
 input.close()
 ```
+N-gram taggers can be defined for large values of n, but once n is larger than 3, we usually encounter the sparse data problem; even with a large quantity of training data, we see only a tiny fraction of possible contexts.
 
 # Transformation-Based Tagging
+A potential issue with n-gram taggers is the size of their n-gram table (or language model).简单来说因为是sparse array所以它太占空间了。
 
-230
+A second issue concerns context.它只看前几个，所以信息不足会误判。
+
+之后介绍了Brill tagging is a kind of transformation-based learning,这是supervised learning。 Transformation-based tagging involves learning a series of repair rules of the form “change tag s to tag t in context c,” where each rule fixes mistakes and possibly introduces a (smaller) number of errors.
+
+# How to Determine the Category of a Word
+linguists use morphological, syntactic, and semantic clues to determine the category of a word.
+
+Morphological Clues指的是用诸如suffix（词尾）来推断词性；Syntactic Clues通过句法判断，比如你知道be后面的大概率是一个adj；Semantic Clues通过语义猜测，比如你知道某个德语词和生日同义，那么你就猜它是名词。
